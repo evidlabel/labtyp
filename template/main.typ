@@ -1,5 +1,4 @@
-#import "../lib.typ": lablist, lab, mset
-// Set document metadata
+#import "@preview/labtyp:0.1.0": lablist, lab, mset
 
 #mset(values: (
   title: "The title of the document", 
