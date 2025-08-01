@@ -20,8 +20,8 @@ Which can then be translated into `hayagriva` or `biblatex` formats.
 
 `labtyp` defines 3 commands:
 
-- `lab`: creates an in-place label, defined by key, text, note
-- `mset`: adds metadata that gets assigned to _subsequent labels_ (i.e. labels defined below the current mset command in the document), like the title of the document, date, pagenumber in the original document, this can be expanded with any key
+- `lab`: creates an in-place label, defined by `key`, `text` and  `note`
+- `mset`: adds metadata that gets assigned to _subsequent labels_ (i.e. labels defined below the current mset command in the document), like the title of the document, date, pagenumber in the original document, this can be expanded with any key for other labelling needs
 
   - Each label ends up being a concatenation of the label information, and the mset information. 
 - `lablist`: prints a table of the labels created 
@@ -32,7 +32,7 @@ Which can then be translated into `hayagriva` or `biblatex` formats.
 
 = Labelling in vscode
 
-In order to label text in vscode using `ctrl+L`, define the following in `keybindings.json`:
+In order to label currently selected text in vscode using `ctrl+L`, define the following in `keybindings.json`:
 
 ```json
     {
