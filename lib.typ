@@ -1,52 +1,30 @@
 // State to track the current headings hierarchy
 #let current-headings = state("current-headings", ())
 
-// State for document title
-#let document-title = state("document-title", none)
+// State for document metadata
+#let document-metadata = state("document-metadata", (:))
 
-// State for document author
-#let document-author = state("document-author", none)
-
-// State for current date
-#let current-date = state("current-date", none)
-
-#let original-page = state("orig-page", none)
-
-// Function to set document title
-#let set-title(title) = {
-  document-title.update(title)
+// Function to update document metadata
+#let mset(values: (:)) = {
+  document-metadata.update(old => {
+    let updated = old
+    for (k, v) in values {
+      updated.insert(k, v)
+    }
+    updated
+  })
 }
-
-// Function to set document author
-#let set-author(author) = {
-  document-author.update(author)
-}
-
-// Function to set current date
-#let set-date(date) = {
-  current-date.update(date)
-}
-
-#let set-page(page) = {
-  original-page.update(page)
-}
-
 
 // Function to create a label with underlined text, footnote, and metadata
 #let lab(key, text, note) = {
   context [
+    #let meta = document-metadata.at(here())
     #underline(stroke: blue)[#text]#footnote[#key: #note]#hide[
-      #metadata((
+      #metadata( meta + (
         key: key,
         text: text,
         note: note,
-        // the keys below here can be in a dict
         page: counter(page).at(here()).first(),
-        // heading: current-headings.at(here()),
-        original-page: original-page.at(here()), 
-        title: document-title.at(here()),
-        author: document-author.at(here()),
-        date: current-date.at(here()),
       )) <lab>
     ]
   ]
@@ -60,20 +38,19 @@
       [No labels found.]
     } else {
       table(
-        columns: (auto, auto, auto, auto, auto, auto, auto, auto, auto),
+        columns: (auto, auto, auto, auto, auto, auto, auto, auto),
         [*Key*], [*Text*], [*Note*], [*Page*], [*Original Page*], [*Title*], [*Author*], [*Date*],
         ..labels.map(l => {
           let data = l.value
           (
-            link(l.location(), data.key),
-            link(l.location(), data.text),
-            link(l.location(), data.note),
-            link(l.location(), str(data.page)),
-            link(l.location(), if data.at("original-page") != none { str(data.at("original-page")) } else { [Undefined] }),
-            // link(l.location(), if data.heading.len() > 0 { data.heading.join(" / ") } else { [No Heading] }),
-            link(l.location(), if data.title != none { data.title } else { [Undefined] }),
-            link(l.location(), if data.author != none { data.author } else { [Undefined] }),
-            link(l.location(), if data.date != none { data.date } else { [Undefined] })
+            link(l.location(), data.at("key", default: [Undefined])),
+            link(l.location(), data.at("text", default: [Undefined])),
+            link(l.location(), data.at("note", default: [Undefined])),
+            link(l.location(), str(data.at("page", default: 0))),
+            link(l.location(), if data.at("page", default: none) != none { str(data.at("page")) } else { [Undefined] }),
+            link(l.location(), data.at("title", default: [Undefined])),
+            link(l.location(), data.at("author", default: [Undefined])),
+            link(l.location(), data.at("date", default: [Undefined]))
           )
         }).flatten()
       )

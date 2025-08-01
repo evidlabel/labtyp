@@ -1,31 +1,73 @@
-#import "../lib.typ": lablist, lab, set-title, set-author, set-date, set-page
+#import "../lib.typ": lablist, lab, mset
 // Set document metadata
-#set-title("The title of the document")
-#set-author("Jane Doe")
-#set-date("2025-07-31")
 
-= Introduction
-== Subsection
-#set-page(1)
+#mset(values: (
+  title: "The title of the document", 
+  author: "Jane Doe", 
+  date: "2025-07-31",
+  newlab: "more"))
 
+= `labtyp` 
+`labtyp` is a package that allows using typst for labelling text documents like dialogue threads or legal documents for precise citing. 
 
+A json file with the labels in a document can be produced using `typst query`
 
-This is an example document using the `labtyp` package.
-
-#lab("sample_key", "Sample text", "This is a sample note")
-
-// Redefine date for subsequent labels
-#set-date("2025-08-01")
-#set-page(2)
-
-= Another Section
-
-This is more content.
-// #set-title("Sample Document two")
+```bash
+typst query main.typ <lab> > doclabels.json
+``` 
+Which can then be translated into `hayagriva` or `biblatex` formats. 
 
 
-#lab("another_key", "Another text", "Another note")
+`labtyp` defines 3 commands:
+
+- `lab`: creates an in-place label, defined by key, text, note
+- `mset`: adds metadata that gets assigned to _subsequent labels_ (i.e. labels defined below the current mset command in the document), like the title of the document, date, pagenumber in the original document, this can be expanded with any key
+
+  - Each label ends up being a concatenation of the label information, and the mset information. 
+- `lablist`: prints a table of the labels created 
+
+
+#mset(values: (opage: 1))
+#mset(values: (date: "2025-08-01", opage: 2))
+
+= Labelling in vscode
+
+In order to label text in vscode using `ctrl+L`, define the following in `keybindings.json`:
+
+```json
+    {
+        "key": "ctrl+L",
+        "command": "editor.action.insertSnippet",
+        "when": "editorTextFocus && editorLangId == 'typst'",
+        "args": {"snippet": "#lab(\"$1\",\"${TM_SELECTED_TEXT}\",\"$2\")"}
+    }
+```
+= Example
+This is what a labelled document looks like in typst:
+```typst
+#mset(values: (
+  title: "The title of the document", 
+  author: "Jane Doe", 
+  date: "2025-07-31",
+  newlab: "more"))
+=== A labelled dialogue
+#mset(values:(date:"2025-07-1", author:"X"))
+X: #lab("mail1","Can you get some rice and coffee on the way home","email by X to Y")
+#mset(values:(date:"2025-07-2", author:"Y"))
+Y: #lab("mail2","Sorry, I didn't check my mail.. ","reply by Y to X")
+= List of Labels
+#lablist()
+```
+== Rendered
+Below the same dialogue rendered:
+
+=== A labelled dialogue
+#mset(values:(date:"2025-07-1", author:"X"))
+X: #lab("mail1","Can you get some rice and coffee on the way home","email by X to Y")
+
+#mset(values:(date:"2025-07-2", author:"Y"))
+
+Y: #lab("mail2","Sorry, I didn't check my mail.. ","reply by Y to X")
 
 = List of Labels
 #lablist()
-
